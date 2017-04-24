@@ -1,7 +1,7 @@
 select
   field1,
-  field2
+  @field2
 from
-  my_table
+  @my_table
 where
-  field3 in @arg
+  @field3 in @in_arg
