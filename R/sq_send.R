@@ -13,5 +13,7 @@
 #' @export
 sq_send <- function(.query, .with, ...)
 {
-  .with(.query, ...)
+  .query <- lapply(.query,as.character)
+  results <- lapply(.query,FUN = .with,...)
+  do.call("rbind",results)
 }
