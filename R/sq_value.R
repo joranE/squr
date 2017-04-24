@@ -17,7 +17,7 @@ sq_value <- function(value, quote = NULL)
   if (inherits(value, "sq_value"))
     return(value)
 
-  if (is.list(value)) {
+  if (length(value) > 1) {
 
     out <- paste0("(", paste(vapply(value, sq_value, character(1), quote = quote),
                              collapse = ","), ")")
