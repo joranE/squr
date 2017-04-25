@@ -6,52 +6,26 @@
 #' @details The values will be prepared with \code{sq_value}
 #'
 #' @export
-sq_set <- function(.query, ..., max_in = 3)
+sq_set <- function(.query, ...)
 {
   dots <- list(...)
-  dots_len <- sapply(dots,length)
-  max_len <- max(dots_len)
+  params <- lapply(dots, sq_value)
+  names <- names(params)
+  sort_index <- order(nchar(names))
 
-  if (max_len > max_in){
-    n_queries <- ceiling(max_len / max_in)
-    .query <- replicate(n_queries,.query,simplify = FALSE)
-    param_chunks <- lapply(seq_len(n_queries),
-                           function(i,x) {lapply(x,`[[`,i)},
-                           lapply(dots,el_split,n_chunks = n_queries))
+  if (is.null(names) || any(names == "")){
+    stop("Parameters must be named.")
+  }
 
-    for (i in seq_along(.query)){
-      params <- lapply(param_chunks[[i]], sq_value)
-      names <- names(params)
-
-      if (is.null(names) || any(names == ""))
-        stop("Parameters must be named.")
-
-      sort_index <- order(nchar(names))
-
-      .query[[i]] <- sq_set_(.query[[i]], params[sort_index])
-    }
-    return(.query)
-
+  if (length(.query) == 1){
+    result <- sq_set_(.query, params[sort_index])
   } else{
-    params <- lapply(dots, sq_value)
-    names <- names(params)
-
-    if (is.null(names) || any(names == ""))
-      stop("Parameters must be named.")
-
-    sort_index <- order(nchar(names))
-    sq_set_(.query, params[sort_index])
+    result <- vector(mode = "list",length = length(.query))
+    for (i in seq_along(.query)){
+      result[[i]] <- sq_set_(.query[[i]], params[sort_index])
+    }
   }
-}
-
-el_split <- function(x,n_chunks){
-  if (length(x) == 1){
-    old_class <- class(x)
-    lapply(rep(x,n_chunks),`class<-`,old_class)
-  }
-  else{
-    split(x,rep(seq_len(n_chunks),length.out = length(x)))
-  }
+  result
 }
 
 #' Internal Recursive Parameterization Function
