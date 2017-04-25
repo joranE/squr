@@ -11,10 +11,16 @@
 sq_set_include <- function(.query, .label, .path)
 {
   include <- `if`(inherits(.path, "sq"), .path, sq_file(.path))
-
   pattern <- paste0("@", .label, ":include(?![[:alnum:]_#\\$\\@:])")
 
-  result <- gsub(pattern, include, .query, perl = TRUE)
-
-  sq_text(result)
+  if (length(.query) == 1){
+    result <- gsub(pattern, include, .query, perl = TRUE)
+    result <- sq_text(result)
+  }else{
+    result <- vector(mode = "list",length = length(.query))
+    for (i in seq_along(.query)){
+      result[[i]] <- gsub(pattern, include, .query, perl = TRUE)
+      result[[i]] <- sq_text(result[[i]])
+    }
+  }
 }
