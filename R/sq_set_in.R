@@ -4,7 +4,9 @@ sq_set_in <- function(.query,...,max_in = 5){
   # Params with length > 1 are assumed to be
   # for IN clauses
   dots <- list(...)
-  if (length(dots) > 1) stop("Can only split on one IN clause param at a time.")
+  if (length(dots) > 1 || length(.query) > 1){
+    stop("Can only split on one IN clause param at a time.")
+  }
   dots_len <- sapply(dots,length)
   max_len <- max(dots_len)
 
