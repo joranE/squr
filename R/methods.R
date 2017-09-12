@@ -4,13 +4,20 @@
 #' @param ... Passed on to \code{cat}.
 #'
 #' @export
-print.sq <- function(x, ...)
-{
-  if (!inherits(x, "sq") || !is.character(x))
+print.sq <- function(x, ...){
+  if (!inherits(x, "sq") || !is.character(x$sql))
     stop("Invalid sq object.")
 
-  cat(x)
+  cat(x$sql)
+  invisible(x)
+}
 
+#' @export
+print.sql <- function(x, ...){
+  if (!inherits(x, "sql") || !is.character(x))
+    stop("Invalid sql object.")
+
+  cat(x)
   invisible(x)
 }
 
@@ -20,8 +27,7 @@ print.sq <- function(x, ...)
 #' @param ... Passed to \code{print.default}.
 #'
 #' @export
-print.sq_value <- function(x, ...)
-{
+print.sq_value <- function(x, ...){
   if (!inherits(x, "sq_value") || !is.character(x))
     stop("Invalid sq_value object.")
 
@@ -29,19 +35,4 @@ print.sq_value <- function(x, ...)
 
   print(unclass(x))
   invisible(x)
-}
-
-#' Concatenate sq objects
-#'
-#' Concatenate two sq chunks, separated by two line breaks.
-#'
-#' @param e1 An \code{sq} object.
-#' @param e2 An \code{sq} object.
-#'
-#' @return An \code{sq} object.
-#'
-#' @export
-`+.sq` <- function(e1, e2)
-{
-  sq_text(paste(e1, e2, sep = "\n"))
 }

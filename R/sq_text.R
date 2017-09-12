@@ -1,14 +1,12 @@
 #' Inline SQL Query
 #'
-#' @param text A character SQL query.
+#' @param .query A character SQL query.
 #'
 #' @return An \code{sq} object.
 #'
 #' @export
-sq_text <- function(text)
+sq_text <- function(.query)
 {
-  if (!is_scalar_character(text))
-    stop("Argument 'text' should be a scalar character value")
-
-  structure(text, class = c("sq", "sql", "character"))
+  structure(.query$sql, class = c("sq", "character"),
+            docs = .query$doc)
 }

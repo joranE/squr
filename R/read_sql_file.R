@@ -1,17 +1,16 @@
 #' Read a SQL File
 #'
 #' @param path The path to the file to be read.
-#' @param remove_ignored logical indicating whether ignore blocks should be removed.
 #'
-#' @return character with file contents.
+#' @return List with elements \code{sql} containing the SQL text and \code{docs}
+#' containing any documention lines beginning with #'.
 #' @noRd
-read_sql_file <- function(path, remove_ignored = TRUE)
-{
-  content <- paste(readLines(path, warn = FALSE), collapse = "\n")
+read_sql_file <- function(path){
+  content <- readLines(path, warn = FALSE)
+  query_docs <- content[grepl("^#'",content)]
+  query_text <- content[!grepl("^#'",content)]
+  query_text <- paste(query_text, collapse = "\n")
 
-  if (isTRUE(remove_ignored))
-    gsub("^(?:[\t ]*(?:\r?\n|\r))+", "", gsub("--rignore.*?--end", "", content), perl = TRUE)
-  else
-    content
-
+  return(list(sql = query_text,
+              docs = query_docs))
 }

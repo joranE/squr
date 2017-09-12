@@ -1,31 +1,51 @@
 #' Parameterize an SQL Query
 #'
+#' Assign values to parameters in the query. The SQL text is not altered in this
+#' function, the values are merely recorded. Binding occurs at the last moment
+#' in \code{sq_send}.
+#'
 #' @param .query An \code{sq} object or a character string.
-#' @param ... name-value pairs of named parameters.
+#' @param ... name-value pairs of named parameters. Unnamed arguemtns or named
+#' arguments that do not match any parameters in the query will generate an
+#' error. Any value with length greater than \code{max_in} will be split into
+#' pieces of size at most \code{max_in}. For parameters corresponding to column
+#' or table names you can use \code{sq_value} directly in order to specify the
+#' correct quoting behavior.
+#' @param max_in maximum number of values allowed in a single IN clause. Defaults
+#' to 1000.
 #'
 #' @details The values will be prepared with \code{sq_value}
-#'
+#' @return A sq object with its \code{values} element set.
 #' @export
-sq_set <- function(.query, ...)
-{
+sq_set <- function(.query, ..., max_in = 5){
   dots <- list(...)
-  params <- lapply(dots, sq_value)
-  names <- names(params)
-  sort_index <- order(nchar(names))
+  dot_names <- names(dots)
 
-  if (is.null(names) || any(names == "")){
+  if (is.null(dot_names) || any(dot_names == "")){
     stop("Parameters must be named.")
   }
 
-  if (length(.query) == 1){
-    result <- sq_set_(.query, params[sort_index])
-  } else{
-    result <- vector(mode = "list",length = length(.query))
-    for (i in seq_along(.query)){
-      result[[i]] <- sq_set_(.query[[i]], params[sort_index])
+  missing_params <- setdiff(names(dots),.query$params)
+  if (length(missing_params) > 0){
+    stop(sprintf("Parameter(s) %s not found in SQL text.",
+                 paste(missing_params,collapse = ",")))
+  }
+
+  for (i in seq_along(dots)){
+    n <- length(dots[[i]])
+    if (n > max_in){
+      dots[[i]] <- split(x = dots[[i]],
+                         f = ntile(dots[[i]],ceiling(n / max_in)))
     }
   }
-  result
+
+  if (is.null(.query$values)){
+    .query$values <- dots
+  }else{
+    extra_params <- setdiff(names(.query$values),names(dots))
+    .query$values <- c(.query$values[extra_params],dots)
+  }
+  .query
 }
 
 #' Internal Recursive Parameterization Function
@@ -37,19 +57,39 @@ sq_set <- function(.query, ...)
 #'   to avoid errors when some names are subsets of others.
 #'
 #' @noRd
-sq_set_ <- function(query, params)
-{
+sq_set_ <- function(query, params){
   param <- names(params)[[1L]]
   value <- params[[1L]]
 
   pattern <- paste0(param, "(?![[:alnum:]_#\\$\\@:])")
 
-  prefix  <- `if`(any(grepl(paste0("@_", pattern), query, perl = TRUE)), "@_", "@")
+  if (any(grepl(paste0("@_", pattern), query, perl = TRUE))){
+    prefix <- "@_"
+  }else{
+    prefix <- "@"
+  }
 
   result <- gsub(paste0(prefix, pattern), value, query, perl = TRUE)
 
   if (length(params) > 1)
     sq_set_(result, params[-1])
   else
-    sq_text(result)
+    structure(result,class = c("sql","character"))
+}
+
+#' Rough binning rank
+#'
+#' Borrowed from dplyr::ntile.
+#'
+#' @param x vector
+#' @param n number of bins
+#' @noRD
+ntile <- function (x, n){
+  len <- sum(!is.na(x))
+  if (len == 0L) {
+    rep(NA_integer_, length(x))
+  }
+  else {
+    as.integer(floor(n * (rank(x,ties.method = "first",na.last = "keep") - 1)/len + 1))
+  }
 }

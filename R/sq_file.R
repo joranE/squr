@@ -1,24 +1,21 @@
 #' Read The Contents of an SQL File
 #'
-#' @param path character specifying the path to an SQL file. The ".sql" extension can be omitted iff
-#'   the actual extension is lower case.
-#'   When used in a package, the path will be taken to be relative to the \code{inst} folder.
-#' @param remove_ignored boolean; if TRUE, remove portions of file enclosed in
-#' \code{--rignore} and \code{--end}.
+#' @param path character specifying the path to an SQL file. The ".sql"
+#' extension can be omitted if and only if the actual extension is lower case.
+#' When used in a package, the path will be taken to be relative to the
+#' \code{inst} folder.
 #'
-#' @return A \code{sql} object.
+#' @return A \code{sq} object; a list with components \code{sql}, \code{params},
+#' \code{values} and \code{docs}.
 #'
 #' @export
-sq_file <- function(path,remove_ignored = TRUE)
-{
+sq_file <- function(path,remove_ignored = TRUE){
   if (!is_scalar_character(path))
     stop("Argument 'path' should be a scalar character value")
 
   path.sql <- append_sql_extension(path)
 
-
   if (is_packaged()) {
-
     pkg_name <- package_name()
     use_path <- system.file(path.sql, package = pkg_name)
     if (use_path == "")
@@ -27,9 +24,7 @@ sq_file <- function(path,remove_ignored = TRUE)
                    pkg_name))
 
   } else {
-
     use_path <- path.sql
-
   }
 
   normalized <- normalizePath(use_path, mustWork = FALSE)
@@ -37,9 +32,12 @@ sq_file <- function(path,remove_ignored = TRUE)
   if (!file.exists(normalized))
     stop(sprintf("The SQL file '%s' cannot be found.", normalized))
 
-  sql <- read_sql_file(normalized,
-                       remove_ignored = remove_ignored)
+  sql <- read_sql_file(normalized)
 
-  sq_text(sql)
+  structure(list(sql = sql$sql,
+                 params = get_params(.query = sql$sql),
+                 values = NULL,
+                 docs = sql$docs),
+            class = c("sq"))
 }
 
