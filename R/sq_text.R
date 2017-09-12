@@ -5,8 +5,10 @@
 #' @return An \code{sq} object.
 #'
 #' @export
-sq_text <- function(.query)
-{
-  structure(.query$sql, class = c("sq", "character"),
-            docs = .query$doc)
+sq_text <- function(.query){
+  structure(list(sql = .query,
+                 params = get_params(.query = .query),
+                 values = NULL,
+                 docs = NULL),
+            class = "sq")
 }
