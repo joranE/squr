@@ -9,20 +9,20 @@
 #' @importFrom DBI sqlInterpolate ANSI
 #'
 #' @noRd
-dbi_interpolate <- function(value, quote = NULL)
-{
+dbi_interpolate <- function(value, quote = NULL){
   if (length(value) > 1) {
-    map_character(value, dbi_interpolate)
+    purrr::map_chr(value, dbi_interpolate)
   } else {
 
     right_quote <-
-      if (!is.null(quote)) switch(quote, "[" = "]", '"' = '"', "'" = "'",
+      if (!is.null(quote)) switch(quote, "[" = "]", '"' = '"', "'" = "'","none" = "",
                                   stop("Invalid quote character."))
 
-    out <- sqlInterpolate(ANSI(), "?value", value = value)
+    out <- DBI::sqlInterpolate(ANSI(), "?value", value = value)
 
     if (!is.null(quote)) {
-      gsub("^[^[:alnum:]]", quote, gsub("[^[:alnum:]]$", right_quote, out))
+      left_quote <- if (quote == "none") "" else quote
+      gsub("^[^[:alnum:]]", left_quote, gsub("[^[:alnum:]]$", right_quote, out))
     } else {
       out
     }
