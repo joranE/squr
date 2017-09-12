@@ -2,7 +2,10 @@
 #'
 #' @param path The path to a \code{.sql} file, possibly without extension.
 #' @noRd
-append_sql_extension <- function(path)
-{
-  `if`(grepl(".*\\.sql$", path, ignore.case = TRUE), path, paste0(path, ".sql"))
+append_sql_extension <- function(path){
+  if (grepl(".*\\.sql$", path, ignore.case = TRUE)){
+    path
+  }else{
+    paste0(path, ".sql")
+  }
 }

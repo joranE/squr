@@ -2,8 +2,7 @@
 #'
 #' @return Environment
 #' @noRd
-calling_env <- function()
-{
+calling_env <- function(){
   top        <- topenv(environment(calling_env))
   frames     <- c(.GlobalEnv, sys.frames())
   topenvs    <- lapply(frames, topenv)

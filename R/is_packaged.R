@@ -2,9 +2,11 @@
 #'
 #' @return logical
 #' @noRd
-is_packaged <- function()
-{
-  exists(".packageName", calling_env(), mode = "character", inherits = TRUE)
+is_packaged <- function(){
+  exists(".packageName",
+         calling_env(),
+         mode = "character",
+         inherits = TRUE)
 }
 
 #' Get Package Name
@@ -14,8 +16,7 @@ is_packaged <- function()
 #'
 #' @return logical
 #' @noRd
-package_name <- function()
-{
+package_name <- function(){
   tryCatch(get(".packageName", envir    = calling_env(),
                                mode     = "character",
                                inherits = TRUE),
