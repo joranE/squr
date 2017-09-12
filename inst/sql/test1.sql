@@ -1,7 +1,15 @@
+#' Query Title
+#'
+#' @param in_arg IN argument
+#' @param field4 a value
+#' @return field1 description of field1
+#' @return field2 describtion of field2
 select
   field1,
-  @field2
+  field2,
+  @field3
 from
-  @my_table
+  my_table
 where
-  @field3 in @in_arg
+  bar in @in_arg and
+  foo = @field4
