@@ -4,10 +4,10 @@
 \alias{sq_text}
 \title{Inline SQL Query}
 \usage{
-sq_text(text)
+sq_text(.query)
 }
 \arguments{
-\item{text}{A character SQL query.}
+\item{.query}{A character SQL query.}
 }
 \value{
 An \code{sq} object.
@@ -15,4 +15,3 @@ An \code{sq} object.
 \description{
 Inline SQL Query
 }
-

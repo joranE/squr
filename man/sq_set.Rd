@@ -4,7 +4,7 @@
 \alias{sq_set}
 \title{Parameterize an SQL Query}
 \usage{
-sq_set(.query, ...)
+sq_set(.query, ..., max_in = 5)
 }
 \arguments{
 \item{.query}{An \code{sq} object or a character string.}
@@ -17,4 +17,3 @@ Parameterize an SQL Query
 \details{
 The values will be prepared with \code{sq_value}
 }
-

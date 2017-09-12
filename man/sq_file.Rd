@@ -4,12 +4,15 @@
 \alias{sq_file}
 \title{Read The Contents of an SQL File}
 \usage{
-sq_file(path)
+sq_file(path, remove_ignored = TRUE)
 }
 \arguments{
 \item{path}{character specifying the path to an SQL file. The ".sql" extension can be omitted iff
 the actual extension is lower case.
 When used in a package, the path will be taken to be relative to the \code{inst} folder.}
+
+\item{remove_ignored}{boolean; if TRUE, remove portions of file enclosed in
+\code{--rignore} and \code{--end}.}
 }
 \value{
 A \code{sql} object.
@@ -17,4 +20,3 @@ A \code{sql} object.
 \description{
 Read The Contents of an SQL File
 }
-
