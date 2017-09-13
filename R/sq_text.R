@@ -1,5 +1,7 @@
 #' Inline SQL Query
 #'
+#' Create a `sq` object from inline SQL passed as a character object.
+#'
 #' @param .query A character SQL query.
 #'
 #' @return An \code{sq} object.
