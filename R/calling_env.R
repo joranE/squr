@@ -1,7 +1,6 @@
 #' Get the First (Non squr) Calling Environment
 #'
 #' @return Environment
-#' @noRd
 calling_env <- function(){
   top        <- topenv(environment(calling_env))
   frames     <- c(.GlobalEnv, sys.frames())

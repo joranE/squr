@@ -2,19 +2,23 @@
 % Please edit documentation in R/sq_replace.R
 \name{sq_replace}
 \alias{sq_replace}
-\title{Replace Arbitary Parts of Query Using gsub}
+\title{Replace arbitary parts of query using gsub}
 \usage{
 sq_replace(.query, pattern, replacement, ...)
 }
 \arguments{
+\item{.query}{a sq object}
+
 \item{pattern}{character; passed to pattern argument of gsub}
 
 \item{replacement}{character; passed to replacement argument of gsub}
 
 \item{\dots}{further arguments to gsub}
-
-\item{sq}{squr query object}
+}
+\value{
+A sq object with possibly modified set of parameters.
 }
 \description{
-Replace Arbitary Parts of Query Using gsub
+Thin wrapper around \code{gsub} for manual edits to SQL text. Can only be
+used prior setting parameter values with `\code{sq_set}.
 }

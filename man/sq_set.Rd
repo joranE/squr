@@ -4,15 +4,29 @@
 \alias{sq_set}
 \title{Parameterize an SQL Query}
 \usage{
-sq_set(.query, ..., max_in = 5)
+sq_set(.query, ..., max_in = 1000)
 }
 \arguments{
 \item{.query}{An \code{sq} object or a character string.}
 
-\item{...}{name-value pairs of named parameters.}
+\item{...}{name-value pairs of named parameters. Unnamed arguemtns or named
+arguments that do not match any parameters in the query will generate an
+error. Vectors intended to be used as values for \code{IN} clauses should be
+passed via the \code{IN} function, e.g. \code{name = IN(value)}. Such values
+with length greater than \code{max_in} will be split into pieces of size at
+most \code{max_in}. For parameters corresponding to column or table names you
+can use \code{sq_value} directly in order to specify the correct quoting behavior.}
+
+\item{max_in}{maximum number of values allowed in a single IN clause. Defaults
+to 1000.}
+}
+\value{
+A sq object with its \code{values} element set.
 }
 \description{
-Parameterize an SQL Query
+Assign values to parameters in the query. The SQL text is not altered in this
+function, the values are merely recorded. Binding occurs at the last moment
+in \code{sq_send}.
 }
 \details{
 The values will be prepared with \code{sq_value}

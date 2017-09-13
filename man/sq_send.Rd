@@ -2,7 +2,7 @@
 % Please edit documentation in R/sq_send.R
 \name{sq_send}
 \alias{sq_send}
-\title{Send a Query}
+\title{Send a query}
 \usage{
 sq_send(.query, .with, ...)
 }
@@ -21,4 +21,9 @@ Small function that invokes another given function for sending
 a query to the database. The benefit of using this wrapper is
 to keep database/driver boilerplate code separate from functions
 that sends queries.
+}
+\details{
+Values are bound to parameters here via \code{sq_bind}. If necessary,
+long IN clause values are split, multiple identical queries are sent and
+then the results are combined.
 }

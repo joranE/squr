@@ -7,8 +7,6 @@
 #' @param quote Optional quoting character to use; can be one of '[' and '"'.
 #'   If this is NULL, DBI's default is used.
 #' @importFrom DBI sqlInterpolate ANSI
-#'
-#' @noRd
 dbi_interpolate <- function(value, quote = NULL){
   if (length(value) > 1) {
     purrr::map_chr(value, dbi_interpolate)

@@ -13,5 +13,5 @@ sq_text(.query)
 An \code{sq} object.
 }
 \description{
-Inline SQL Query
+Create a `sq` object from inline SQL passed as a character object.
 }

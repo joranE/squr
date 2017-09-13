@@ -60,7 +60,6 @@ sq_set <- function(.query, ..., max_in = 1e3){
 #' @details The parameters should be sorted to have longer names first
 #'   to avoid errors when some names are subsets of others.
 #'
-#' @noRd
 sq_set_ <- function(query, params){
   param <- names(params)[[1L]]
   value <- params[[1L]]
@@ -87,7 +86,6 @@ sq_set_ <- function(query, params){
 #'
 #' @param x vector
 #' @param n number of bins
-#' @noRD
 ntile <- function (x, n){
   len <- sum(!is.na(x))
   if (len == 0L) {

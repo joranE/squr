@@ -1,7 +1,6 @@
 #' Infer if Call is Made From Package
 #'
 #' @return logical
-#' @noRd
 is_packaged <- function(){
   exists(".packageName",
          calling_env(),
@@ -15,7 +14,6 @@ is_packaged <- function(){
 #' If not packaged, an empty character value is returned.
 #'
 #' @return logical
-#' @noRd
 package_name <- function(){
   tryCatch(get(".packageName", envir    = calling_env(),
                                mode     = "character",
