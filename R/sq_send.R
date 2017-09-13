@@ -17,6 +17,7 @@
 #' @export
 sq_send <- function(.query, .with, ...){
   bound_query <- sq_bind(.query)
+  bound_query <- lapply(bound_query,as.character)
   results <- lapply(bound_query,FUN = .with,...)
   results <- do.call("rbind",results)
   rownames(results) <- NULL
