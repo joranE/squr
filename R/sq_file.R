@@ -9,7 +9,7 @@
 #' \code{values} and \code{docs}.
 #'
 #' @export
-sq_file <- function(path,remove_ignored = TRUE){
+sq_file <- function(path){
   if (!is_scalar_character(path))
     stop("Argument 'path' should be a scalar character value")
 
