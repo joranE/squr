@@ -1,10 +1,19 @@
 ![squr-hex](./squr-hex.png?raw=true "squr logo")
 # squr [/'skju:əɹ/]: Structured Query Utility for R
 
+This is a substantially re-written fork of Stefan Milton Bache's `squr` package.
+
 The `squr` (pronounced "skewer") package provides a set of tools
 for managing structured query language (SQL) files in R projects.
 It promotes the separation of logic and query scripts and eases the process
 of reading, parameterizing, and composing SQL queries.
+
+The primary changes are the removal of several features that are unnecessary
+for my own purposes (transactions, `INSERT` statements, ignore blocks,
+composing SQL snippets with `+`) although I may add them back at a later date.
+Additionally, I've made significant internal changes to handle the (specific 
+to me) situation of needing to run queries with very long `IN` clauses with
+more than 1000 elements.
 
 ## Example
 
@@ -63,109 +72,41 @@ Note:
 
 For the rare occasion, there is also `sq_text`, which is the 
 way to add inline SQL. Both `sq_file` and `sq_text` produces
-S3 objects which are character types with an additional class
-`sq` to enable a few methods (`print` and `+`).
+S3 objects which are lists with an additional class
+`sq` to enable a few methods (e.g. `print`).
 
-## Insertion Blocks
-`INSERT` statements can be constructed easily with `sq_insert`:
-```R
-# Use all column names as-is:
-sq_insert(.into = "TableName", .data = the_data)
-
-# Manually specify values:
-sq_insert(.into = "TableName", ~Foo, Bar = ~Baz , .data = the_data)
-```
-Unnamed values will use its R name as column name.
-
-It is also possible to use an "insert parameter" in a query, which is then 
-set with `sq_set_insert`. These parameters are of the form `@Label:insert`:
+## Parameterizing IN Clauses
+Suppose we have the following SQL:
 
 ```SQL
--- Suppose the SQL query in query.sql is:
-BEGIN TRANSACTION;
-
-DECLARE @Deleted INT
-
-DELETE 
-  FROM TheTable 
- WHERE Foo = @Foo
-
-SELECT @Deleted = @@ROWCOUNT
-
-@NewObs:insert
-
-SELECT @Deleted AS Deleted
-     , @@ROWCOUNT AS Inserted
-
-COMMIT TRANSACTION;
-```
-
-Then the R code is, e.g.:
-```R
-result <-
-  sq_file("sql/query") %>% 
-  sq_set(Foo = Bar) %>% 
-  sq_set_insert("NewObs", .into = "TableName", .data = the_data) %>% 
-  sq_send(.with = rodbc)
-```
-
-The default behaviour is to treat the `...` as *names* of values to insert.
-To insert values directly/as-is use `I()` function:
-```R
-sq_insert("Table", colnames(the_data), Ten = I(10), .data = head(the_data))
-```
-
-## Includes
-Sometimes it is useful to be able to use the same SQL snippets in several queries, 
-e.g. some Common Table Expressions (CTE) that are used several places. 
-For this purpose one can use "include parameters" of the form `@Label:include` and
-the `sq_set_include`. Example:
-```SQL
--- shared.sql
-;WITH SomeData AS 
-(
-  SELECT *
-    FROM SomeTable
-    WHERE This = @This
-      AND That = @That
-)
-```
-
-```SQL
--- specific.sql
-@CTE:include
-
 SELECT *
-  FROM OtherTable o
- INNER JOIN SomeData s
-    ON o.This = s.That
+  FROM table
+ WHERE column IN @column
 ```
+and we'd like to be able to run this query with various collections of values
+inserted for `@column`. In `squr` we can do the following:
 
-```R
-sql <- 
-  sq_file("specific") %>% 
-  sq_set_include("CTE", "shared") %>% 
-  sq_set(This = this, That = that) 
-```
-
-## Transactions
-When combining files and chunks then it can be useful to wrap them 
-in a `TRANSACTION`. There's a small utility function for this:
-
-```R
-update <- sq_file("update")
-insert <- sq_file("insert")
-
-result <-
-  sq_transaction(update, insert) %>% 
-  sq_set(Param = value) %>% 
+```r
+result <- sq_text(.query = "select * from table where column in @column") %>%
+  sq_set(column = IN(1:10)) %>%
   sq_send(.with = rodbc)
 ```
+Wrapping the vector of values to be bound with `IN()` ensures that they are 
+properly formatted and wrapped in parens. This will work for only a single value,
+resulting in something like `column IN (1)`. Also, if the vector of values passed
+is longer than 1000 `squr` will split it into chunks of size at most 1000 and 
+then send multiple queries for each chunk, `rbind`ing the results.
+
+Splitting `IN` clauses like this only works for one `IN` clause per SQL query.
+
+## Replacing SQL Text Inline
+There is also a function `sq_replace` that is a wrapper for `gsub` that allows
+you to edit SQL text, but only prior to setting parameter values with `sq_set`.
 
 ## Dynamic Table and Column Names
-Since values are appropriately quoted, the default replacements
-will not work for dynamically specifying e.g. column and table names.
-However, you can use `sq_value` explicitely (this is the function used
+Since values are appropriately quoted when they are bound, the default 
+replacements will not work for dynamically specifying column and table names.
+However, you can use `sq_value` explicitly (this is the function used
 internally to prepare a value for SQL):
 
 ```SQL
@@ -187,41 +128,6 @@ result <-
          Feature  = sq_value("Turnover", quote = "[")) %>% 
   sq_send(.with = rodbc)
 ```
-
-## Alternative Parameter Specifications
-It happens that the `@Param` notation is inadequate, e.g. when executing stored procedures:
-
-```SQL
---bad:
-EXEC MyStoredProcedure @Param1 = @Param1, @Param2 = @Param2
-```
-
-Here, `@Param*` on both sides of the equality signs will be replaced! Therefore `squr` has
-the convention: if `@_Param` exists (with the underscore) this will be replaced and `@Param` will
-not. The R call is the same, i.e. one would use `sq_set(Param = value)`.
-
-```
---Good:
-EXEC MyStoredProcedure @Param1 = @_Param1, @Param2 = @_Param2
-```
-
-## SQL to be Ignored
-To ignore certain parts of an SQL script in R, enclose it in 
-`--rignore` and `--end`:
-
-```SQL
---rignore
-DECLARE @DateFrom DATE = '2016-01-01'
-DECLARE @DateTo   DATE = '2016-06-30'
---end
-
-SELECT *
-  FROM Customers
- WHERE Date BETWEEN @DateFrom AND @DateTo
-```
-
-The above then is a complete working example in an SQL IDE, and the 
-variable declarations are ignored in R.
 
 ## A note on SQL injection
 The `squr::sq_value` function uses `DBI::sqlInterpolate` to parse values.
