@@ -1,7 +1,9 @@
 Package: squr
 Title: Structured Query Utility for R
-Version: 0.0.2
-Authors@R: person("Stefan Milton", "Bache", email = "stefan@stefanbache.dk", role = c("aut", "cre"))
+Version: 0.0.3
+Authors@R: c(
+  person("Elias", "Joran", email = "joran.elias@gmail.com", role = c("aut","cre")),
+  person("Stefan Milton", "Bache", email = "stefan@stefanbache.dk", role = c("aut", "cre")))
 Description: squr (pronounce 'skewer' /'skju:əɹ/)
   is a small utility that provides a set of tools
   for managing structured query language (SQL) files in R projects.
