@@ -11,3 +11,5 @@ are split into chunks and when `sq_send()` is called multiple queries are sent
 and then conbined.
 
 * Add tests
+
+* Update README.md
