@@ -7,17 +7,18 @@
 #' @param .query An \code{sq} object or a character string.
 #' @param ... name-value pairs of named parameters. Unnamed arguemtns or named
 #' arguments that do not match any parameters in the query will generate an
-#' error. Any value with length greater than \code{max_in} will be split into
-#' pieces of size at most \code{max_in}. For parameters corresponding to column
-#' or table names you can use \code{sq_value} directly in order to specify the
-#' correct quoting behavior.
+#' error. Vectors intended to be used as values for \code{IN} clauses should be
+#' passed via the \code{IN} function, e.g. \code{name = IN(value)}. Such values
+#' with length greater than \code{max_in} will be split into pieces of size at
+#' most \code{max_in}. For parameters corresponding to column or table names you
+#' can use \code{sq_value} directly in order to specify the correct quoting behavior.
 #' @param max_in maximum number of values allowed in a single IN clause. Defaults
 #' to 1000.
 #'
 #' @details The values will be prepared with \code{sq_value}
 #' @return A sq object with its \code{values} element set.
 #' @export
-sq_set <- function(.query, ..., max_in = 5){
+sq_set <- function(.query, ..., max_in = 1e3){
   dots <- list(...)
   dot_names <- names(dots)
 
@@ -34,8 +35,11 @@ sq_set <- function(.query, ..., max_in = 5){
   for (i in seq_along(dots)){
     n <- length(dots[[i]])
     if (n > max_in){
+      #To preserve IN class in case one piece is a singleton
+      old_class <- class(dots[[i]])
       dots[[i]] <- split(x = dots[[i]],
                          f = ntile(dots[[i]],ceiling(n / max_in)))
+      dots[[i]] <- lapply(dots[[i]],`class<-`,old_class)
     }
   }
 
@@ -92,4 +96,13 @@ ntile <- function (x, n){
   else {
     as.integer(floor(n * (rank(x,ties.method = "first",na.last = "keep") - 1)/len + 1))
   }
+}
+
+#' Mark parameter value for use with IN clause
+#'
+#' @param x a vector of values, possibly only of length 1
+#' @return The original object with the class attribute appended with "IN".
+#' @export
+IN <- function(x){
+  structure(x,class = c(class(x),"IN"))
 }
