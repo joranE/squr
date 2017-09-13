@@ -38,6 +38,6 @@ sq_file <- function(path,remove_ignored = TRUE){
                  params = get_params(.query = sql$sql),
                  values = NULL,
                  docs = sql$docs),
-            class = c("sq"))
+            class = "sq")
 }
 
