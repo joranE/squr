@@ -104,3 +104,22 @@ ntile <- function (x, n){
 IN <- function(x){
   structure(x,class = c(class(x),"IN"))
 }
+
+#' Wrap parameter value in wildcards
+#'
+#' Pad value with wildcard symbol for when it is used with a parameter in a
+#' LIKE expression in SQL.
+#'
+#' @param x character
+#' @param side character; one of 'l' (left), 'r' (right) or 'b' (both)
+#' @param wildcard character; defaults to '%'
+#' @export
+LIKE <- function(x,side,wildcard = "%"){
+  if (!side %in% c('l','r','b')) stop("side must be 'l', 'r' or 'b'.")
+  if (length(x) > 1) stop("Argument x should be of length one.")
+
+  switch(side,
+         'l' = paste0(wildcard,x),
+         'r' = paste0(x,wildcard),
+         'b' = paste0(wildcard,x,wildcard))
+}
