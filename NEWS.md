@@ -10,6 +10,9 @@
 are split into chunks and when `sq_send()` is called multiple queries are sent
 and then conbined.
 
+* `LIKE()` wraps values in a wildcard character when binding to a parameter
+used with a SQL `LIKE` expression
+
 * Add tests
 
 * Update README.md
