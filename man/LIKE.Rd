@@ -2,7 +2,7 @@
 % Please edit documentation in R/sq_set.R
 \name{LIKE}
 \alias{LIKE}
-\title{Wrap parameter value in wildcards}
+\title{Pad values with wildcard symbol}
 \usage{
 LIKE(x, side, wildcard = "\%")
 }
@@ -11,9 +11,9 @@ LIKE(x, side, wildcard = "\%")
 
 \item{side}{character; one of 'l' (left), 'r' (right) or 'b' (both)}
 
-\item{wildcard}{character; defaults to '%'}
+\item{wildcard}{character; defaults to "\%"}
 }
 \description{
-Pad value with wildcard symbol for when it is used with a parameter in a
-LIKE expression in SQL.
+Pads single values with wildcard symbol on left, right or both
+for use with parameters in LIKE expressions.
 }

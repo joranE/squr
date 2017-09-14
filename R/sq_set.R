@@ -105,14 +105,14 @@ IN <- function(x){
   structure(x,class = c(class(x),"IN"))
 }
 
-#' Wrap parameter value in wildcards
+#' Pad values with wildcard symbol
 #'
-#' Pad value with wildcard symbol for when it is used with a parameter in a
-#' LIKE expression in SQL.
+#' Pads single values with wildcard symbol on left, right or both
+#' for use with parameters in LIKE expressions.
 #'
 #' @param x character
 #' @param side character; one of 'l' (left), 'r' (right) or 'b' (both)
-#' @param wildcard character; defaults to '%'
+#' @param wildcard character; defaults to "\%"
 #' @export
 LIKE <- function(x,side,wildcard = "%"){
   if (!side %in% c('l','r','b')) stop("side must be 'l', 'r' or 'b'.")
