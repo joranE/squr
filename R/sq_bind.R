@@ -7,8 +7,11 @@
 #' @importFrom purrr pmap
 #' @export
 sq_bind <- function(.query){
-  if (is.null(.query$values))
-    stop("No values have been set. Nothing to bind.")
+  #If no parameters, nothing to do
+  if (!has_params(.query)) return(.query)
+  #Parameters but no values is an error
+  if (has_params(.query) && is.null(.query$values))
+    stop(".query has parameters but no values to bind to them.")
 
   vals <- .query$values
 
@@ -30,4 +33,8 @@ sq_bind <- function(.query){
   lapply(X = vals_interp,
          FUN = function(params,query) sq_set_(query = query,params = params),
          query = .query$sql)
+}
+
+has_params <- function(.query){
+  !is.null(.query$params) && length(.query$params) > 0
 }
