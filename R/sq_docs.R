@@ -4,134 +4,103 @@
 #' @return a list with documentation including \code{introduction}, \code{return},
 #'         and \code{params} (as a data frame).
 sq_docs <- function(.query) {
-  lines <- attr(.query,"doc")
 
-  #Borrowed heavily from roxygen2
-  #https://github.com/yihui/roxygen2/blob/master/R/parse-preref.R
-  LINE.DELIMITER <- "\\s*#+' ?"
-  delimited.lines <- lines[str_detect(lines, LINE.DELIMITER)]
-  trimmed.lines <- str_trim(str_replace(delimited.lines, LINE.DELIMITER, ""), "right")
-  if (length(trimmed.lines) == 0) return(list())
-  joined.lines <- str_c(trimmed.lines, collapse = '\n')
-  elements <- strsplit(joined.lines, '(?<!@)@(?!@)', perl = TRUE)[[1]]
-  elements <- str_replace_all(elements, fixed("@@"), "@")
-  parsed.introduction <- parse_instruduction(elements[[1]])
-  parsed.elements <- unlist(lapply(elements[-1], parse_element), recursive = FALSE)
+}
 
-  sqldoc <- c(parsed.introduction, parsed.elements)
+#' @export
+sq_parse_docs <- function(.query){
+  docs <- gsub(pattern = "^#'",
+               replacement = "",
+               x = .query$docs)
+  docs <- trimws(docs,which = "both")
 
-  if(length(get_params(.query)) > 0 & !is.na(get_params(.query)[1])) {
+  tag_idx <- which(grepl("^@",docs))
 
-    params <- data.frame(Param = get_params(.query),
-                         Desc = NA,
-                         stringsAsFactors=FALSE)
+  title <- docs[1]
+  description <- docs[2:(tag_idx[1] - 1)]
+  description <- trimws(paste(description,collapse = " "),which = "both")
 
-    for(l in sqldoc[names(sqldoc) == 'param']) {
-      params[params$Param == l$name,]$Desc <- l$description
+  tags <- vector(mode = "list",length = length(tag_idx))
+  tag_names <- vector(mode = "list",length = length(tag_idx))
+
+  for (i in seq_along(tag_idx)){
+    if (i == length(tag_idx)){
+      tags[[i]] <- docs[tag_idx[i]:length(docs)]
+    }else{
+      tags[[i]] <- docs[tag_idx[i]:(tag_idx[i+1] - 1)]
+    }
+    tags[[i]] <- paste(tags[[i]],collapse = " ")
+    tag_names[[i]] <- stringr::str_extract(tags[[i]],
+                                           pattern = "^@(param)|^@(functions)|^@(scripts)")
+    tags[[i]] <- stringr::str_replace(string = tags[[i]],
+                                      pattern = "^@(param)\\s+|^@(functions)\\s+|^@(scripts)\\s+",
+                                      replacement = "")
+    if (tag_names[[i]] == '@param'){
+      rexpr <- "^(\\w+)\\s?(.*)$"
+      tags[[i]] <- list(param_name = sub(rexpr,"\\1",tags[[i]]),
+                        param_desc = sub(rexpr,"\\2",tags[[i]]))
     }
 
-    for(l in sqldoc[names(sqldoc) == 'default']) {
-      params[params$Param == l$name,]$default <- l$description
+    if (tag_names[[i]] %in% c('@functions','@scripts')){
+      tags[[i]] <- strsplit(tags[[i]],",\\s+")
     }
-    sqldoc$params <- params
+
   }
 
-  returns <- data.frame(Variable = character(),
-                        Desc = character(),
-                        stringsAsFactors=FALSE)
+  names(tags) <- gsub(pattern = "@","",tag_names,fixed = TRUE)
 
-  for(l in sqldoc[names(sqldoc) == 'return']) {
-    returns <- rbind(returns,
-                     data.frame(Variable = l$name,
-                                Desc=l$description,
-                                stringsAsFactors=FALSE))
+  title_chunk <- "---\ntitle: '%s'\noutput: html_document\n---\n"
+  description_chunk <- "### Description\n\n%s\n"
+  param_chunk <- "### Parameters\n\n%s"
+  functions_chunk <- "### Functions\nThis query is called from the following functions:\n\n%s"
+  scripts_chunk <- "### Scripts\nThis query is called from the following scripts:\n\n%s"
+  sql_chunk <- sprintf("### SQL\n```{sql}\n%s\n```\n",.query$sql)
+
+  param_docs <- tags[grepl(pattern = "param",names(tags))]
+  fun_docs <- tags[grepl(pattern = "functions",names(tags))]
+  script_docs <- tags[grepl(pattern = "scripts",names(tags))]
+
+  param_docs <- lapply(param_docs,
+                       function(x) paste("*",paste(x,collapse = " - "),sep = " "))
+  param_docs <- paste(param_docs,collapse = "\n")
+  param_chunk <- sprintf(param_chunk,param_docs)
+
+  fun_docs <- lapply(unlist(fun_docs),
+                     function(x) paste(paste("*",x),collapse = "\n"))
+  functions_chunk <- sprintf(functions_chunk,paste(fun_docs,collapse = "\n"))
+
+  script_docs <- lapply(unlist(script_docs),
+                        function(x) paste(paste("*",x),collapse = "\n"))
+  scripts_chunk <- sprintf(scripts_chunk,paste(script_docs,collapse = "\n"))
+
+  structure(list(title = sprintf(title_chunk,title),
+              description = sprintf(description_chunk,description),
+              parameters = paste0(param_chunk,"\n"),
+              functions = paste0(functions_chunk,"\n"),
+              scripts = paste0(scripts_chunk,"\n"),
+              sql = sql_chunk),
+            class = "sq_docs")
+}
+
+#' @export
+#' @importFrom rmarkdown render
+#' @importFrom rstudioapi viewer
+sq_view_docs <- function(docs){
+  dir <- tempfile()
+  dir.create(dir)
+  md_file <- file.path(dir, "sq_doc.md")
+
+  for (i in seq_along(docs)){
+    cat(docs[[i]],
+        sep = "\n",
+        file = md_file,
+        fill = FALSE,
+        append = TRUE)
   }
 
-  sqldoc <- sqldoc[!(names(sqldoc) %in% c('param', 'return'))]
-  sqldoc$returns <- returns
+  rmarkdown::render(input = md_file,
+                    output_file = "sq_doc.html",
+                    quiet = TRUE)
 
-  class(sqldoc) <- c('sq_doc')
-  return(sqldoc)
-}
-
-#' Prints the SQL documentation.
-#' @param x sq_doc object.
-#' @param ... currently unused.
-#' @method print sq_doc
-#' @rdname print
-print.sq_doc <- function(x, ...) {
-  cat(x$introduction)
-  cat('\n\n')
-  if(!is.null(x$params)) {
-    cat('Parameters:\n')
-    print(x$params, row.names=FALSE)
-  }
-  cat("\n")
-  if(!is.null(x$returns)) {
-    cat('Returns (note that this list may not be complete):\n')
-    print(x$returns, row.names=FALSE)
-  }
-}
-
-#' Parse a raw string containing key and expressions.
-#'
-#' Copied from roxygen2: https://github.com/yihui/roxygen2/blob/master/R/parse-preref.R
-#'
-#' @param element the string containing key and expressions
-#' @param srcref source reference.
-#' @return A list containing the parsed constituents
-#' @author yihui
-parse_element <- function(element, srcref) {
-  # From an old version of roxygen2
-  parse_name_description <- function(key, rest, srcref) {
-    pieces <- str_split_fixed(rest, "[[:space:]]+", 2)
-    name <- pieces[, 1]
-    rest <- str_trim(pieces[, 2])
-    if(is_null_string(name)) {
-      stop(paste0(key, " requires a name and description: ", srcref))
-    }
-    list(name = name, description = rest)
-  }
-
-  #TODO: This should only be done once when the package loads
-  preref_parsers <- new.env(parent=emptyenv())
-  preref_parsers[['default']] <- parse_name_description
-  preref_parsers[['return']] <- parse_name_description
-  preref_parsers[['param']] <- parse_name_description
-
-  pieces <- str_split_fixed(element, "[[:space:]]+", 2)
-
-  tag <- pieces[, 1]
-  rest <- pieces[, 2]
-
-  #tag_parser <- preref_parsers[[tag]] %||% parse.unknown
-  tag_parser <- preref_parsers[[tag]]
-  res <- list(tag_parser(tag, rest, NULL))
-  names(res) <- tag
-  return(res)
-}
-
-#' Parse introduction: the premier part of a roxygen block
-#' containing description and option details separated by
-#' a blank roxygen line.
-#'
-#' Copied from roxygen2: https://github.com/yihui/roxygen2/blob/master/R/parse-preref.R
-#'
-#' @param expression the description to be parsed
-#' @return A list containing the parsed description
-#' @author yihui
-parse_instruduction <- function(expression) {
-  if (is_null_string(expression)) return(NULL)
-  list(introduction = str_trim(expression))
-}
-
-#' Does the string contain no matter, but very well [:space:]?
-#' @param string the string to check
-#' @return TRUE if the string contains words, otherwise FALSE
-is_null_string <- function(string) {
-  str_length(str_trim(string)) == 0
-}
-
-"%||%" <- function(a, b) {
-  if (!is.null(a)) a else b
+  rstudioapi::viewer(file.path(dir,"sq_doc.html"))
 }
