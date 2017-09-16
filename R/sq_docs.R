@@ -1,15 +1,6 @@
-#' Parses the query and returns a list with all the elements of the comment.
-#'
-#' @param query_docs the query name.
-#' @return a list with documentation including \code{introduction}, \code{return},
-#'         and \code{params} (as a data frame).
-sq_docs <- function(.query) {
-
-}
-
 #' @export
 sq_parse_docs <- function(.query){
-  docs <- gsub(pattern = "^#'",
+  docs <- gsub(pattern = "^--",
                replacement = "",
                x = .query$docs)
   docs <- trimws(docs,which = "both")
