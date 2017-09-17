@@ -3,7 +3,7 @@
 #' @param path The path to the file to be read.
 #'
 #' @return List with elements \code{sql} containing the SQL text and \code{docs}
-#' containing any documention lines beginning with #'.
+#' containing any documention lines beginning with "--".
 read_sql_file <- function(path){
   content <- readLines(path, warn = FALSE)
 

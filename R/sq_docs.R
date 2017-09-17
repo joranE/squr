@@ -1,3 +1,15 @@
+#' Parse SQL file documentation
+#'
+#' Parse the documentation (if any exists) from the header of the SQL file
+#' that generated \code{.query}.
+#'
+#' @param .query a \code{sq} object, e.g. created by \code{sq_file}
+#' @return list with class "sq_docs" containing the documentation parsed
+#' into markdown
+#' @details See \link{\code{sq_file}} for a description of the documentation
+#' format. When a "sq_docs" is printed at the console or via \code{sq_view_docs}
+#' the markdown is written to a temp file, converted to html and then viewed
+#' in either Rstudio's viewer pane (if available) or via \code{browseURL}.
 #' @export
 sq_parse_docs <- function(.query){
   docs <- gsub(pattern = "^--",
@@ -76,10 +88,15 @@ sq_parse_docs <- function(.query){
 #' @export
 #' @importFrom rmarkdown render
 #' @importFrom rstudioapi viewer
-sq_view_docs <- function(docs){
-  dir <- tempfile()
-  dir.create(dir)
-  md_file <- file.path(dir, "sq_doc.md")
+sq_view_docs <- function(docs,md_path = NULL){
+  if (is.null(md_path)){
+    dir <- tempfile()
+    dir.create(dir)
+    md_file <- file.path(dir, "sq_doc.md")
+  }else{
+    dir <- md_path
+    md_file <- file.path(md_path,"sq_doc.md")
+  }
 
   for (i in seq_along(docs)){
     cat(docs[[i]],
@@ -93,5 +110,11 @@ sq_view_docs <- function(docs){
                     output_file = "sq_doc.html",
                     quiet = TRUE)
 
-  rstudioapi::viewer(file.path(dir,"sq_doc.html"))
+  viewer <- getOption("viewer")
+
+  if (!is.null(viewer)){
+    rstudioapi::viewer(file.path(dir,"sq_doc.html"))
+  }else{
+    utils::browseURL(file.path(dir,"sq_doc.html"))
+  }
 }

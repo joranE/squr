@@ -1,4 +1,4 @@
-#' Read The Contents of an SQL File
+#' Read the contents of an SQL file
 #'
 #' @param path character specifying the path to an SQL file. The ".sql"
 #' extension can be omitted if and only if the actual extension is lower case.
@@ -7,6 +7,23 @@
 #'
 #' @return A \code{sq} object; a list with components \code{sql}, \code{params},
 #' \code{values} and \code{docs}.
+#'
+#' @details \code{sq_file} assumes that any lines at the beginning of the SQL file
+#' that are commented out via "- -" (two dashes) contain documentation. Subsequent commented out
+#' lines within the query itself are not considered part of the SQL file documentation.
+#'
+#' It assumes a simple format roughly in the style of roxygen2. The first line
+#' contains the query title, followed by a blank comment line, and then possibly
+#' several lines comprising a description of the query.
+#'
+#' Next, \code{sq_file} recognizes three tags:
+#'
+#' \describe{
+#' \item{@@param}{the name of the parameter followed by a space and then a description;
+#' you can include multiple param tags each starting on its own line}
+#' \item{@@functions}{comma separated list of functions that use this query}
+#' \item{@@scripts}{comma separated list of scripts that use this query}
+#' }
 #'
 #' @export
 sq_file <- function(path){

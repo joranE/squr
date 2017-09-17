@@ -11,7 +11,7 @@ read_sql_file(path)
 }
 \value{
 List with elements \code{sql} containing the SQL text and \code{docs}
-containing any documention lines beginning with #'.
+containing any documention lines beginning with "--".
 }
 \description{
 Read a SQL File
