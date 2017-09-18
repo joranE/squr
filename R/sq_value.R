@@ -21,8 +21,14 @@ sq_value <- function(value, quote = NULL)
 
   if (inherits(value,"IN") || length(value) > 1) {
     #Recursive call and collapse with commas
-    out <- paste(vapply(value, sq_value, character(1), quote = quote),
-                 collapse = ",")
+    #out <- paste(vapply(value, sq_value, character(1), quote = quote),
+    #             collapse = ",")
+    if (inherits(value,"character")){
+      out <- DBI::dbQuoteString(DBI::ANSI(),value)
+    }else{
+      out <- value
+    }
+    out <- paste(as.character(out),collapse = ",")
     #Wrap in parens
     out <- paste0("(", out, ")")
   } else {
