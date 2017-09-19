@@ -1,4 +1,4 @@
-#' Parse SQL file documentation
+#' Generate SQL documentation
 #'
 #' Parse the documentation (if any exists) from the header of the SQL file
 #' that generated \code{.query}.
@@ -10,6 +10,18 @@
 #' format. When a "sq_docs" is printed at the console or via \code{sq_view_docs}
 #' the markdown is written to a temp file, converted to html and then viewed
 #' in either Rstudio's viewer pane (if available) or via \code{browseURL}.
+#' @export
+sq_docs <- function(.query){
+  if (is.null(.query$docs) || length(.query$docs) == 0){
+    warning("No docs in SQL query")
+    invisible(.query)
+  }else{
+    sq_parse_docs(.query)
+  }
+}
+
+#' Parse SQL file documentation
+#'
 #' @export
 sq_parse_docs <- function(.query){
   docs <- gsub(pattern = "^--",
@@ -27,6 +39,9 @@ sq_parse_docs <- function(.query){
   tag_names <- vector(mode = "list",length = length(tag_idx))
 
   for (i in seq_along(tag_idx)){
+    if (!grepl("^@param|^@functions|^@scripts",docs[tag_idx[i]])){
+      next
+    }
     if (i == length(tag_idx)){
       tags[[i]] <- docs[tag_idx[i]:length(docs)]
     }else{
