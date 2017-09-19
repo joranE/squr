@@ -16,9 +16,10 @@ to me) situation of needing to run queries with very long `IN` clauses with
 more than 1000 elements.
 
 ## Who is squr for?
-squr uses `DBI::sqlInterpolate` to parse values, but also allows for arbitrary
-string manipulation of SQL queries via `sq_replace`, and interpolating values
-is not as secure as using each database's parameterized query functionality. 
+squr uses `DBI::sqlInterpolate` and `DBI::dbQuoteString` to parse values, but 
+also allows for arbitrary string manipulation of SQL queries via `sq_replace`. 
+Interpolating values is not as secure as using each database's 
+parameterized query functionality. 
 
 Because of this, squr is aimed at users for whom SQL injection attacks are a
 fairly low concern. This may include situations like,
@@ -106,7 +107,7 @@ result <- sq_text(.query = "select * from table where column in @column") %>%
 
 Wrapping the vector of values to be bound with `IN()` ensures that they are 
 properly formatted and wrapped in parens. This will work for only a single value,
-resulting in something like `column IN (1)`. Also, if the vector of values passed
+converting `IN(1)` into `column IN (1)`. Also, if the vector of values passed
 is longer than 1000 `squr` will split it into chunks of size at most 1000 and 
 then send multiple queries for each chunk, `rbind`ing the results.
 
@@ -164,6 +165,48 @@ result <-
          Feature  = sq_value("Turnover", quote = "[")) %>% 
   sq_send(.with = rodbc)
 ```
+
+## Documenting SQL Queries
+squr allows for limited documentation within your .sql files, using a very simple
+syntax along the lines of [roxygen2](https://github.com/klutometis/roxygen). All
+commented out lines at the beginning of a .sql file are assumed to be documentation.
+An example illustrating the format is:
+
+```{sql}
+-- Test Query
+--
+-- Pulls `column1` and `column1` from `my_table` filtering on a particular value for
+-- `condition`.
+--
+-- @param foo a value for condition, e.g. "bar"
+-- @param bar a value for another condition, this time with a
+-- longer description across multiple lines.
+-- @functions my_fun, your_fun, lots_of_fun,
+-- more_fun, final_fun
+-- @scripts script1.R, script2.R
+select
+  column1,
+  column2
+from
+  my_table
+where
+  condition = @foo
+  another_condition = @bar
+```
+
+The first line, `Test Query` is the query title. The next section forms the 
+description, with a blank commented line above and below.
+
+Only three tags are recognized:
+
+* `@param` a single word denoting the name of the paramter, a space and then a 
+description of the parameter
+* `@functions` a comma separated list of functions that the SQL query is used in,
+e.g. for when squr is used within another package
+* `@scripts` a comma separated list of .R scripts that the SQL query is used in,
+e.g. for when squr is used in an RStudio project.
+
+Other tags are ignored.
 
 ## See also
 A similar (but different) project for Clojure (with ports for some other languages) by @krisajenkins is [Yesql](https://github.com/krisajenkins/yesql).
