@@ -52,34 +52,6 @@ sq_set <- function(.query, ..., max_in = 1e3){
   .query
 }
 
-#' Internal Recursive Parameterization Function
-#'
-#' @param query The query text to be parameterized.
-#' @param params A list of parameters.
-#'
-#' @details The parameters should be sorted to have longer names first
-#'   to avoid errors when some names are subsets of others.
-#'
-sq_set_ <- function(query, params){
-  param <- names(params)[[1L]]
-  value <- params[[1L]]
-
-  pattern <- paste0(param, "(?![[:alnum:]_#\\$\\@:])")
-
-  if (any(grepl(paste0("@_", pattern), query, perl = TRUE))){
-    prefix <- "@_"
-  }else{
-    prefix <- "@"
-  }
-
-  result <- gsub(paste0(prefix, pattern), value, query, perl = TRUE)
-
-  if (length(params) > 1)
-    sq_set_(result, params[-1])
-  else
-    structure(result,class = c("sql","character"))
-}
-
 #' Rough binning rank
 #'
 #' Borrowed from dplyr::ntile.
