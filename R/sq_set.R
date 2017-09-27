@@ -41,6 +41,15 @@ sq_set <- function(.query, ..., max_in = 1e3){
                          f = ntile(dots[[i]],ceiling(n / max_in)))
       dots[[i]] <- lapply(dots[[i]],`class<-`,old_class)
     }
+
+
+    if (inherits(dots[[i]],"IS_NULL") || inherits(dots[[i]],"IS_NOT_NULL")){
+      regex <- sprintf("([=<>]{1,3}|(like)|(LIKE))\\s+(%s)",paste0("@",dot_names[i]))
+      .query$sql <- gsub(pattern = regex,
+                         replacement = "\\1",
+                         .query$sql)
+    }
+
   }
 
   if (is.null(.query$values)){
@@ -73,8 +82,9 @@ ntile <- function (x, n){
 #' @param x a vector of values, possibly only of length 1
 #' @return The original object with the class attribute appended with "IN".
 #' @export
-IN <- function(x){
-  structure(x,class = c(class(x),"IN"))
+IN <- function(x = NULL){
+  if (is.null(x)) stop("Argument x passed to IN() is NULL")
+  structure(x,class = c("IN",class(x)))
 }
 
 #' Pad values with wildcard symbol
@@ -86,7 +96,8 @@ IN <- function(x){
 #' @param side character; one of 'l' (left), 'r' (right) or 'b' (both)
 #' @param wildcard character; defaults to "\%"
 #' @export
-LIKE <- function(x,side,wildcard = "%"){
+LIKE <- function(x = NULL,side,wildcard = "%"){
+  if (is.null(x)) stop("Argument x passed to LIKE() is NULL")
   if (!side %in% c('l','r','b')) stop("side must be 'l', 'r' or 'b'.")
   if (length(x) > 1) stop("Argument x should be of length one.")
 
@@ -94,4 +105,23 @@ LIKE <- function(x,side,wildcard = "%"){
          'l' = paste0(wildcard,x),
          'r' = paste0(x,wildcard),
          'b' = paste0(wildcard,x,wildcard))
+}
+
+#' Flag parameter to be set to NULL
+#'
+#' Called with no arguments, this flags a parameter for conversion to NULL,
+#' i.e. from something like \code{column <= @param} to \code{column is null}.
+#'
+#' @export
+IS_NULL <- function(){
+  structure("is null",class = c("IS_NULL","character"))
+}
+
+#' Flag parameter to be set to not NULL
+#'
+#' Called with no arguments, this flags a parameter for conversion to NULL,
+#' i.e. from something like \code{column <= @param} to \code{column is not null}.
+#' @export
+IS_NOT_NULL <- function(){
+  structure("is not null",class = c("IS_NOT_NULL","character"))
 }
