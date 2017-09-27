@@ -4,7 +4,7 @@
 \alias{LIKE}
 \title{Pad values with wildcard symbol}
 \usage{
-LIKE(x, side, wildcard = "\%")
+LIKE(x = NULL, side, wildcard = "\%")
 }
 \arguments{
 \item{x}{character}

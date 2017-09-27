@@ -4,7 +4,7 @@
 \alias{IN}
 \title{Mark parameter value for use with IN clause}
 \usage{
-IN(x)
+IN(x = NULL)
 }
 \arguments{
 \item{x}{a vector of values, possibly only of length 1}

@@ -7,7 +7,7 @@
 sq_value(value, quote = NULL)
 }
 \arguments{
-\item{value}{A value to be used in an SQL query.}
+\item{value}{A value or vector of values to be used in an SQL query.}
 
 \item{quote}{The character to be used to quote the (non-numeric) value(s).
 Can be one of '[', '"', "'" and "none". For brackets, use the opening bracket.}
@@ -19,9 +19,10 @@ A character representation appropriate for SQL queries.
 Prepare Value for an SQL Query
 }
 \details{
-\code{NA}s are converted to NULL, other values are coerced to
+\code{NA}s are dropped and at least one element of \code{value}
+must be non-\code{NA}. Other values are coerced to their
 character representation with \code{as.character}, and non-numeric and
-non-NULL values are (single) quoted. Lists and vectors of length >1 are
+non-NULL values are (single) quoted. Vectors of length >1 are
 wrapped in parentheses and values are separated with commas. You can force
 being wrapped in parenthese by using \code{IN}, e.g. \code{sq_value(IN(2))}.
 The \code{quote} parameter is useful for dynamically specifying e.g. columns,
