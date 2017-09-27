@@ -8,7 +8,7 @@
 #' @export
 sq_bind <- function(.query){
   #If no parameters, nothing to do
-  if (!has_params(.query)) return(.query)
+  if (!has_params(.query)) return(.query$sql)
   #Parameters but no values is an error
   if (has_params(.query) && is.null(.query$values))
     stop(".query has parameters but no values to bind to them.")
