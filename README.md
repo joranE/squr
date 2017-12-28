@@ -8,8 +8,8 @@ for managing structured query language (SQL) files in R projects.
 It promotes the separation of logic and query scripts and eases the process
 of reading, parameterizing, and composing SQL queries.
 
-The primary changes are the removal of several features that are unnecessary
-for my own purposes (transactions, `INSERT` statements, ignore blocks,
+The primary changes in this fork are the removal of several features that are 
+unnecessary for my own purposes (transactions, `INSERT` statements, ignore blocks,
 composing SQL snippets with `+`) although I may add them back at a later date.
 Additionally, I've made significant internal changes to handle the (specific 
 to me) situation of needing to run queries with very long `IN` clauses with
@@ -49,8 +49,7 @@ this is left fully flexible and out of scope.
 ```R
 # Simple example of a query function wrapper. This part varies depending
 # on database, drivers, etc, but needs only setup once.
-rodbc <- function(query)
-{
+rodbc <- function(query){
   ch <- RODBC::odbcDriverConnect("<connectionstring>")
   on.exit(RODBC::odbcClose(ch))
   RODBC::sqlQuery(ch, query)
