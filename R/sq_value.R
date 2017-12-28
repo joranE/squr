@@ -1,32 +1,3 @@
-# sq_value <- function(value, quote = NULL){
-#   #Check that value is suitable
-#   if (inherits(value, "sq_value"))
-#     return(value)
-#   if (length(value) == 0)
-#     stop("'value' must be of non-zero length")
-#   if (all(is.na(value)))
-#     stop("'value' must have at least one non-NA value")
-#   if (!is_valid_vector(value))
-#     stop("'value' must be an atomic vector of mode integer, numeric or character")
-#
-#   #value(s) are either for an IN clause or not
-#   if (inherits(value,"IN") || length(value) > 1) {
-#     value <- value[!is.na(value)]
-#     if (inherits(value,"character")){
-#       out <- DBI::dbQuoteString(DBI::ANSI(),value)
-#     }else{
-#       out <- value
-#     }
-#
-#     out <- paste(as.character(out),collapse = ",")
-#     out <- paste0("(", out, ")")
-#   } else {
-#     out <- dbi_interpolate(value,quote)
-#   }
-#
-#   structure(as.character(out), class = c("sq_value", "character"))
-# }
-
 #' Prepare Value for an SQL Query
 #'
 #' @details \code{NA}s are dropped and at least one element of \code{value}
