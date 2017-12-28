@@ -6,7 +6,8 @@
 #' @param .query a sq object
 #' @param pattern character; passed to pattern argument of gsub
 #' @param replacement character; passed to replacement argument of gsub
-#' @param \dots further arguments to gsub
+#' @param \dots further arguments to gsub; in particular \code{fixed = TRUE} is
+#' often desirable in order to avoid problems with SQL text involving periods.
 #'
 #' @return A sq object with possibly modified set of parameters.
 #' @export
