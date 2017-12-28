@@ -1,6 +1,6 @@
 Package: squr
 Title: Structured Query Utility for R
-Version: 0.0.3
+Version: 0.0.3.9000
 Authors@R: c(
   person("Elias", "Joran", email = "joran.elias@gmail.com", role = c("cre")),
   person("Stefan Milton", "Bache", email = "stefan@stefanbache.dk", role = c("aut")))
