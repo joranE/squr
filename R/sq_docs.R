@@ -6,7 +6,7 @@
 #' @param .query a \code{sq} object, e.g. created by \code{sq_file}
 #' @return list with class "sq_docs" containing the documentation parsed
 #' into markdown
-#' @details See \link{\code{sq_file}} for a description of the documentation
+#' @details See sq_file for a description of the documentation
 #' format. When a "sq_docs" is printed at the console or via \code{sq_view_docs}
 #' the markdown is written to a temp file, converted to html and then viewed
 #' in either Rstudio's viewer pane (if available) or via \code{browseURL}.
@@ -30,6 +30,11 @@ sq_parse_docs <- function(.query){
   docs <- trimws(docs,which = "both")
 
   tag_idx <- which(grepl("^@",docs))
+
+  #If no tags
+  if (length(tag_idx) == 0){
+    tag_idx <- length(docs) + 1
+  }
 
   title <- docs[1]
   description <- docs[2:(tag_idx[1] - 1)]
@@ -69,27 +74,53 @@ sq_parse_docs <- function(.query){
 
   title_chunk <- "---\ntitle: '%s'\noutput: html_document\n---\n"
   description_chunk <- "### Description\n\n%s\n"
+
   param_chunk <- "### Parameters\n\n%s"
   functions_chunk <- "### Functions\nThis query is called from the following functions:\n\n%s"
   scripts_chunk <- "### Scripts\nThis query is called from the following scripts:\n\n%s"
+
+  no_param_chunk <- "### Parameters\nNone\n\n%s"
+  no_functions_chunk <- "### Functions\nNone\n\n%s"
+  no_scripts_chunk <- "### Scripts\nNone\n%s"
+
   sql_chunk <- sprintf("### SQL\n```{sql}\n%s\n```\n",.query$sql)
 
   param_docs <- tags[grepl(pattern = "param",names(tags))]
   fun_docs <- tags[grepl(pattern = "functions",names(tags))]
   script_docs <- tags[grepl(pattern = "scripts",names(tags))]
 
-  param_docs <- lapply(param_docs,
-                       function(x) paste("*",paste(x,collapse = " - "),sep = " "))
-  param_docs <- paste(param_docs,collapse = "\n")
-  param_chunk <- sprintf(param_chunk,param_docs)
+  if (length(param_docs) > 0){
+    param_docs <- lapply(param_docs,
+                         function(x) paste("*",paste(x,collapse = " - "),sep = " "))
+    param_docs <- paste(param_docs,collapse = "\n")
+    param_chunk <- sprintf(param_chunk,param_docs)
+  } else{
+    param_docs <- lapply(param_docs,
+                         function(x) paste("*",paste(x,collapse = " - "),sep = " "))
+    param_docs <- paste(param_docs,collapse = "\n")
+    param_chunk <- sprintf(no_param_chunk,param_docs)
+  }
 
-  fun_docs <- lapply(unlist(fun_docs),
-                     function(x) paste(paste("*",x),collapse = "\n"))
-  functions_chunk <- sprintf(functions_chunk,paste(fun_docs,collapse = "\n"))
+  if (length(fun_docs) > 0){
+    fun_docs <- lapply(unlist(fun_docs),
+                       function(x) paste(paste("*",x),collapse = "\n"))
+    functions_chunk <- sprintf(functions_chunk,paste(fun_docs,collapse = "\n"))
+  } else{
+    fun_docs <- lapply(unlist(fun_docs),
+                       function(x) paste(paste("*",x),collapse = "\n"))
+    functions_chunk <- sprintf(no_functions_chunk,paste(fun_docs,collapse = "\n"))
+  }
 
-  script_docs <- lapply(unlist(script_docs),
-                        function(x) paste(paste("*",x),collapse = "\n"))
-  scripts_chunk <- sprintf(scripts_chunk,paste(script_docs,collapse = "\n"))
+
+  if (length(script_docs) > 0){
+    script_docs <- lapply(unlist(script_docs),
+                          function(x) paste(paste("*",x),collapse = "\n"))
+    scripts_chunk <- sprintf(scripts_chunk,paste(script_docs,collapse = "\n"))
+  } else{
+    script_docs <- lapply(unlist(script_docs),
+                          function(x) paste(paste("*",x),collapse = "\n"))
+    scripts_chunk <- sprintf(no_scripts_chunk,paste(script_docs,collapse = "\n"))
+  }
 
   structure(list(title = sprintf(title_chunk,title),
               description = sprintf(description_chunk,description),

@@ -5,7 +5,7 @@
 #' in \code{sq_send}.
 #'
 #' @param .query An \code{sq} object or a character string.
-#' @param ... name-value pairs of named parameters. Unnamed arguemtns or named
+#' @param ... name-value pairs of named parameters. Unnamed arguments or named
 #' arguments that do not match any parameters in the query will generate an
 #' error. Vectors intended to be used as values for \code{IN} clauses should be
 #' passed via the \code{IN} function, e.g. \code{name = IN(value)}. Such values
