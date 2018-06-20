@@ -13,7 +13,8 @@ sq_replace(.query, pattern, replacement, ...)
 
 \item{replacement}{character; passed to replacement argument of gsub}
 
-\item{\dots}{further arguments to gsub}
+\item{\dots}{further arguments to gsub; in particular \code{fixed = TRUE} is
+often desirable in order to avoid problems with SQL text involving periods.}
 }
 \value{
 A sq object with possibly modified set of parameters.

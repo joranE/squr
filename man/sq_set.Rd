@@ -9,7 +9,7 @@ sq_set(.query, ..., max_in = 1000)
 \arguments{
 \item{.query}{An \code{sq} object or a character string.}
 
-\item{...}{name-value pairs of named parameters. Unnamed arguemtns or named
+\item{...}{name-value pairs of named parameters. Unnamed arguments or named
 arguments that do not match any parameters in the query will generate an
 error. Vectors intended to be used as values for \code{IN} clauses should be
 passed via the \code{IN} function, e.g. \code{name = IN(value)}. Such values

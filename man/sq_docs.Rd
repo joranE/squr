@@ -18,7 +18,7 @@ Parse the documentation (if any exists) from the header of the SQL file
 that generated \code{.query}.
 }
 \details{
-See \link{\code{sq_file}} for a description of the documentation
+See sq_file for a description of the documentation
 format. When a "sq_docs" is printed at the console or via \code{sq_view_docs}
 the markdown is written to a temp file, converted to html and then viewed
 in either Rstudio's viewer pane (if available) or via \code{browseURL}.
