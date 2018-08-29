@@ -8,12 +8,14 @@ for managing structured query language (SQL) files in R projects.
 It promotes the separation of logic and query scripts and eases the process
 of reading, parameterizing, and composing SQL queries.
 
-The primary changes in this fork are the removal of several features that are 
+The primary changes in this fork are: the removal of several features that are 
 unnecessary for my own purposes (transactions, `INSERT` statements, ignore blocks,
 composing SQL snippets with `+`) although I may add them back at a later date.
 Additionally, I've made significant internal changes to handle the (specific 
 to me) situation of needing to run queries with very long `IN` clauses with
-more than 1000 elements.
+more than 1000 elements. This includes new parameter specification methods
+that use the helper functions `IN()` and `LIKE()`. Finally there is a minimal
+system for documenting the associated SQL files.
 
 ## Who is squr for?
 squr uses `DBI::sqlInterpolate` and `DBI::dbQuoteString` to parse values, but 
