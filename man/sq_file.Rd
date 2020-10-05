@@ -4,13 +4,16 @@
 \alias{sq_file}
 \title{Read the contents of an SQL file}
 \usage{
-sq_file(path)
+sq_file(path, override_pkg = FALSE)
 }
 \arguments{
 \item{path}{character specifying the path to an SQL file. The ".sql"
 extension can be omitted if and only if the actual extension is lower case.
 When used in a package, the path will be taken to be relative to the
 \code{inst} folder.}
+
+\item{override_pkg}{boolean if \code{TRUE} then forces the use of the raw path
+rather than looking inside the package installation.}
 }
 \value{
 A \code{sq} object; a list with components \code{sql}, \code{params},
