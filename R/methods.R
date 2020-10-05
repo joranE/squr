@@ -13,9 +13,11 @@ print.sq <- function(x, ...){
 }
 
 #' @export
-print.sql <- function(x, ...){
-  if (!inherits(x, "sql") || !is.character(x))
+print.sq_sql <- function(x, ...){
+  if (!inherits(x, "sq_sql") || !is.character(x))
     stop("Invalid sql object.")
+
+  sql <- gsub("\t","  ",x,fixed = TRUE)
 
   cat(x)
   invisible(x)

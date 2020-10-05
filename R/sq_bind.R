@@ -70,5 +70,5 @@ sq_bind_ <- function(query, params){
   if (length(params) > 1)
     sq_bind_(result, params[-1])
   else
-    structure(result,class = c("sql","character"))
+    structure(result,class = c("sq_sql","character"))
 }

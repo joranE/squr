@@ -2,8 +2,8 @@
 
 S3method(print,sq)
 S3method(print,sq_docs)
+S3method(print,sq_sql)
 S3method(print,sq_value)
-S3method(print,sql)
 S3method(sq_value,IN)
 S3method(sq_value,IS_NOT_NULL)
 S3method(sq_value,IS_NULL)

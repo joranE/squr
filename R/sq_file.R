@@ -4,6 +4,8 @@
 #' extension can be omitted if and only if the actual extension is lower case.
 #' When used in a package, the path will be taken to be relative to the
 #' \code{inst} folder.
+#' @param override_pkg boolean if \code{TRUE} then forces the use of the raw path
+#' rather than looking inside the package installation.
 #'
 #' @return A \code{sq} object; a list with components \code{sql}, \code{params},
 #' \code{values} and \code{docs}.
@@ -26,13 +28,13 @@
 #' }
 #'
 #' @export
-sq_file <- function(path){
+sq_file <- function(path,override_pkg = FALSE){
   if (!is_scalar_character(path))
     stop("Argument 'path' should be a scalar character value")
 
   path.sql <- append_sql_extension(path)
 
-  if (is_packaged()) {
+  if (is_packaged() && !override_pkg) {
     pkg_name <- package_name()
     use_path <- system.file(path.sql, package = pkg_name)
     if (use_path == "")
