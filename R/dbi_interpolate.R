@@ -1,11 +1,11 @@
 #' Wrapper for DBIs sqlInterpolate
 #'
 #' This function uses `sqlInterpolate` to parse character values.
-#' The quote par
+#' The quote argument controls how the value is quoted, if at all.
 #'
 #' @param value The value to be quoted.
-#' @param quote Optional quoting character to use; can be one of '[' and '"'.
-#'   If this is NULL, DBI's default is used.
+#' @param quote Optional quoting character to use; can be one of '[', '"', "'"
+#' or "none".
 #' @importFrom DBI sqlInterpolate ANSI
 dbi_interpolate <- function(value, quote = NULL){
   if (length(value) > 1) {

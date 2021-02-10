@@ -90,7 +90,9 @@ IN <- function(x = NULL){
 #' Pad values with wildcard symbol
 #'
 #' Pads single values with wildcard symbol on left, right or both
-#' for use with parameters in LIKE expressions.
+#' for use with parameters in LIKE expressions. Used when you have something
+#' like \code{column like @param} in your sql file in order to convert it to
+#' \code{column like '%val'}, \code{column like 'val%'} or \code{column like '%val%}.
 #'
 #' @param x character
 #' @param side character; one of 'l' (left), 'r' (right) or 'b' (both)

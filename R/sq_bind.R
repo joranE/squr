@@ -1,6 +1,7 @@
 #' Bind values to parameters in SQL
 #'
-#' Insert values into SQL parameters.
+#' Insert values into SQL parameters. This is an internal function and in general
+#' should not be called by the user. Instead, use \code{sq_set}.
 #'
 #' @param .query A sq object
 #' @return A list, possibly of length greater than one, of SQL queries
