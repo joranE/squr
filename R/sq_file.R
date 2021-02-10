@@ -42,7 +42,7 @@ sq_file <- function(path,override_pkg = FALSE,pkg_name = NULL){
 
   path.sql <- append_sql_extension(path)
 
-  if (is_packaged() && !override_pkg) {
+  if (!is.null(pkg_name)) {
     #pkg_name <- package_name()
     #pkg_name <- "UMTools"
     if (is.null(pkg_name)) stop("When calling 'sq_file' from a package must specify pkg_name.")
