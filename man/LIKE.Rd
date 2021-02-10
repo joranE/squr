@@ -14,6 +14,5 @@ LIKE(x = NULL, side, wildcard = "\%")
 \item{wildcard}{character; defaults to "\%"}
 }
 \description{
-Pads single values with wildcard symbol on left, right or both
-for use with parameters in LIKE expressions.
+
 }

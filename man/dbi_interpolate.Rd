@@ -9,10 +9,10 @@ dbi_interpolate(value, quote = NULL)
 \arguments{
 \item{value}{The value to be quoted.}
 
-\item{quote}{Optional quoting character to use; can be one of '[' and '"'.
-If this is NULL, DBI's default is used.}
+\item{quote}{Optional quoting character to use; can be one of '[', '"', "'"
+or "none".}
 }
 \description{
 This function uses `sqlInterpolate` to parse character values.
-The quote par
+The quote argument controls how the value is quoted, if at all.
 }

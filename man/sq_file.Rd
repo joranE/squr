@@ -21,7 +21,11 @@ A \code{sq} object; a list with components \code{sql}, \code{params},
 }
 \description{
 Read query from a .sql file. Parameters in the query should be prefixed
-with "@".
+with "@". This function automatically detects whether it has been called
+from within a package (rather than interactively by the user) and adjusts
+the file path accordingly. The argument \code{override_pkg} can be used
+to bypass this automatic behavior and force the use of the raw file path
+even when called inside a package.
 }
 \details{
 \code{sq_file} assumes that any lines at the beginning of the SQL file
