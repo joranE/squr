@@ -42,7 +42,8 @@ sq_file <- function(path,override_pkg = FALSE){
   path.sql <- append_sql_extension(path)
 
   if (is_packaged() && !override_pkg) {
-    pkg_name <- package_name()
+    #pkg_name <- package_name()
+    pkg_name <- "UMTools"
     use_path <- system.file(path.sql, package = pkg_name)
     if (use_path == "")
       stop(sprintf("The SQL file '%s' cannot be found in package '%s'",
