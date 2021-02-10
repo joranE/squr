@@ -36,13 +36,13 @@
 #'
 #' @export
 sq_file <- function(path,override_pkg = FALSE){
-  if (!squr::is_scalar_character(path))
+  if (!is_scalar_character(path))
     stop("Argument 'path' should be a scalar character value")
 
-  path.sql <- squr::append_sql_extension(path)
+  path.sql <- append_sql_extension(path)
 
-  if (squr::is_packaged() && !override_pkg) {
-    pkg_name <- squr::package_name()
+  if (is_packaged() && !override_pkg) {
+    pkg_name <- package_name()
     use_path <- system.file(path.sql, package = pkg_name)
     if (use_path == "")
       stop(sprintf("The SQL file '%s' cannot be found in package '%s'",
@@ -61,7 +61,7 @@ sq_file <- function(path,override_pkg = FALSE){
   sql <- read_sql_file(normalized)
 
   structure(list(sql = sql$sql,
-                 params = squr::get_params(.query = sql$sql),
+                 params = get_params(.query = sql$sql),
                  values = NULL,
                  docs = sql$docs),
             class = "sq")
