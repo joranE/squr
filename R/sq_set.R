@@ -1,6 +1,8 @@
 #' Parameterize an SQL Query
 #'
-#' Blank description
+#' Assign values to parameters in the query. The SQL text is not altered in this
+#' function, the values are merely recorded. Binding occurs at the last moment
+#' in \code{sq_send}.
 #'
 #' @param .query An \code{sq} object or a character string.
 #' @param \dots name-value pairs of named parameters. Unnamed arguments or named
