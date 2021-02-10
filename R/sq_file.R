@@ -1,5 +1,12 @@
 #' Read the contents of an SQL file
 #'
+#' Read query from a .sql file. Parameters in the query should be prefixed
+#' with "@". This function automatically detects whether it has been called
+#' from within a package (rather than interactively by the user) and adjusts
+#' the file path accordingly. The argument \code{override_pkg} can be used
+#' to bypass this automatic behavior and force the use of the raw file path
+#' even when called inside a package.
+#'
 #' @param path character specifying the path to an SQL file. The ".sql"
 #' extension can be omitted if and only if the actual extension is lower case.
 #' When used in a package, the path will be taken to be relative to the
@@ -29,13 +36,13 @@
 #'
 #' @export
 sq_file <- function(path,override_pkg = FALSE){
-  if (!is_scalar_character(path))
+  if (!squr::is_scalar_character(path))
     stop("Argument 'path' should be a scalar character value")
 
-  path.sql <- append_sql_extension(path)
+  path.sql <- squr::append_sql_extension(path)
 
-  if (is_packaged() && !override_pkg) {
-    pkg_name <- package_name()
+  if (squr::is_packaged() && !override_pkg) {
+    pkg_name <- squr::package_name()
     use_path <- system.file(path.sql, package = pkg_name)
     if (use_path == "")
       stop(sprintf("The SQL file '%s' cannot be found in package '%s'",
@@ -54,7 +61,7 @@ sq_file <- function(path,override_pkg = FALSE){
   sql <- read_sql_file(normalized)
 
   structure(list(sql = sql$sql,
-                 params = get_params(.query = sql$sql),
+                 params = squr::get_params(.query = sql$sql),
                  values = NULL,
                  docs = sql$docs),
             class = "sq")
