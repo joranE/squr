@@ -1,5 +1,7 @@
 #' Get the First (Non squr) Calling Environment
 #'
+#' No longer used
+#'
 #' @return Environment
 calling_env <- function(){
   top        <- topenv(environment(calling_env))
