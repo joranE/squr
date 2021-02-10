@@ -13,6 +13,7 @@
 #' \code{inst} folder.
 #' @param override_pkg boolean if \code{TRUE} then forces the use of the raw path
 #' rather than looking inside the package installation.
+#' @param pkg_name character name of pkg it is being called from
 #'
 #' @return A \code{sq} object; a list with components \code{sql}, \code{params},
 #' \code{values} and \code{docs}.
@@ -35,7 +36,7 @@
 #' }
 #'
 #' @export
-sq_file <- function(path,override_pkg = FALSE){
+sq_file <- function(path,override_pkg = FALSE,pkg_name = NULL){
   if (!is_scalar_character(path))
     stop("Argument 'path' should be a scalar character value")
 
@@ -43,7 +44,8 @@ sq_file <- function(path,override_pkg = FALSE){
 
   if (is_packaged() && !override_pkg) {
     #pkg_name <- package_name()
-    pkg_name <- "UMTools"
+    #pkg_name <- "UMTools"
+    if (is.null(pkg_name)) stop("When calling 'sq_file' from a package must specify pkg_name.")
     use_path <- system.file(path.sql, package = pkg_name)
     if (use_path == "")
       stop(sprintf("The SQL file '%s' cannot be found in package '%s'",
