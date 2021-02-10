@@ -20,7 +20,8 @@ A \code{sq} object; a list with components \code{sql}, \code{params},
 \code{values} and \code{docs}.
 }
 \description{
-Read the contents of an SQL file
+Read query from a .sql file. Parameters in the query should be prefixed
+with "@".
 }
 \details{
 \code{sq_file} assumes that any lines at the beginning of the SQL file
